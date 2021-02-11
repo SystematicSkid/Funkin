@@ -63,62 +63,6 @@ namespace hooks
 		can_input = false;
 		return;
 	}
-
-	PVOID original_check_key = nullptr;
-	bool __fastcall hook_check_key(Input* key)
-	{
-		if (!g_Settings)
-		{
-			g_Settings = *reinterpret_cast<PlayerSettings**>((DWORD)GetModuleHandleA(0) + 0xA814A0);
-			return static_cast<bool(__thiscall*)(Input*)>(original_check_key)(key);
-		}
-		if(!can_input)
-			return static_cast<bool(__thiscall*)(Input*)>(original_check_key)(key);
-		
-		if(g_PlayState)
-		{
-			if (g_PlayState->active_notes)
-			{
-				auto notes = g_PlayState->active_notes->GetObjects();
-				for (auto* note : notes)
-				{
-					if (note && note->can_be_hit)
-					{
-						switch (note->note_type)
-						{
-						case 0:
-							if (key == g_Settings->controls->left || key == g_Settings->controls->left_press)
-							{
-								return true;
-							}
-							break;
-						case 1:
-							if (key == g_Settings->controls->down || key == g_Settings->controls->down_press)
-							{
-								return true;
-							}
-							break;
-						case 2:
-							if (key == g_Settings->controls->up || key == g_Settings->controls->up_press)
-							{
-								return true;
-							}
-							break;
-						case 3:
-							if (key == g_Settings->controls->right || key == g_Settings->controls->right_press)
-							{
-								return true;
-							}
-							break;
-						default:
-							break;
-						}
-					}
-				}
-			}
-		}
-		return static_cast<bool(__thiscall*)(Input*)>(original_check_key)(key);
-	}
 	
 	void init()
 	{
@@ -127,10 +71,6 @@ namespace hooks
 		DWORD address = module + 0x4188B0;
 		MH_CreateHook((PVOID*)address, (PVOID*)hook_playstate, (PVOID*)&original_playstate);
 		MH_EnableHook((PVOID*)address);
-
-		address = module + 0x0F6450;
-		MH_CreateHook((PVOID*)address, (PVOID*)hook_check_key, (PVOID*)&original_check_key);
-		//MH_EnableHook((PVOID*)address);
 
 		g_Settings = *reinterpret_cast<PlayerSettings**>(module + 0xA814A0);
 	}
