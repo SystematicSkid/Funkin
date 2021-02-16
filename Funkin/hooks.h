@@ -62,6 +62,14 @@ namespace hooks
 		can_input = false;
 		return;
 	}
+
+	PVOID original_popupscore = nullptr;
+	void __fastcall hook_popupscore(PlayState* play_state, double strum_time)
+	{
+		/* Cause abs value to always be 0.0 */
+		double current_song_pos = *(double*)((uintptr_t)GetModuleHandle(0) + 0x00CC8740); //F2 0F 5C 35 ? ? ? ? 0F 54 35 ? ? ? ? 
+		return static_cast<void(__fastcall*)(PlayState*, double)>(original_popupscore)(play_state, current_song_pos);
+	}
 	
 	void init()
 	{
@@ -70,6 +78,11 @@ namespace hooks
 		DWORD64 address = module + 0x004B9A00; // 55 8B EC 81 EC ? ? ? ? A1 ? ? ? ? 53 8B D9 56 64 8B 00 57 C6 83 ? ? ? ? ? 
 		MH_CreateHook((PVOID*)address, (PVOID*)hook_playstate, (PVOID*)&original_playstate);
 		MH_EnableHook((PVOID*)address);
+
+		address = module + 0x004B7390; // E8 ? ? ? ? FF 83 ? ? ? ? 48 8B 07 ? ? 
+		MH_CreateHook((PVOID*)address, (PVOID*)hook_popupscore, (PVOID*)&original_popupscore);
+		MH_EnableHook((PVOID*)address);
+		//
 
 		g_Settings = *reinterpret_cast<PlayerSettings**>(module + 0x00CC6FE8);
 	}
