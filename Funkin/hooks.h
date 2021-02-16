@@ -15,8 +15,7 @@ namespace hooks
 		g_PlayState = play_state;
 		can_input = true;
 		if (!g_Settings)
-			g_Settings = *reinterpret_cast<PlayerSettings**>((DWORD)GetModuleHandleA(0) + 0xA814A0);
-		
+			g_Settings = *reinterpret_cast<PlayerSettings**>((DWORD)GetModuleHandleA(0) + 0x00CC6FE8);
 		if(play_state->active_notes)
 		{
 			auto notes = play_state->active_notes->GetObjects();
@@ -67,11 +66,11 @@ namespace hooks
 	void init()
 	{
 		MH_Initialize();
-		DWORD module = reinterpret_cast<DWORD>(GetModuleHandle(NULL));
-		DWORD address = module + 0x4188B0;
+		DWORD64 module = reinterpret_cast<DWORD64>(GetModuleHandle(NULL));
+		DWORD64 address = module + 0x004B9A00; // 55 8B EC 81 EC ? ? ? ? A1 ? ? ? ? 53 8B D9 56 64 8B 00 57 C6 83 ? ? ? ? ? 
 		MH_CreateHook((PVOID*)address, (PVOID*)hook_playstate, (PVOID*)&original_playstate);
 		MH_EnableHook((PVOID*)address);
 
-		g_Settings = *reinterpret_cast<PlayerSettings**>(module + 0xA814A0);
+		g_Settings = *reinterpret_cast<PlayerSettings**>(module + 0x00CC6FE8);
 	}
 }

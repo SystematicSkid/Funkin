@@ -2,7 +2,7 @@
 class Input
 {
 private:
-	char pad[0xC];
+	char pad[0x18];
 public:
 	char* name;
 public:
@@ -21,21 +21,21 @@ public:
 		   retn
 		 */
 		printf("Simulating: %s\n", name);
-		*(bool*)((DWORD)this + 0x28) = 0x1;
-		FlxGame* game = *(FlxGame**)((DWORD)GetModuleHandleA(0) + 0xA831E8);
-		DWORD game_tick = game->tick;
-		*(DWORD*)((DWORD)this + 0x24) = game_tick;
+		*(bool*)((DWORD64)this + 0x44) = 0x1;
+		FlxGame* game = *(FlxGame**)((DWORD64)GetModuleHandleA(0) + 0x00CC9CD0); // A1 ? ? ? ? 8B 80 ? ? ? ? 39 46 24 
+		DWORD64 game_tick = game->tick;
+		*(DWORD*)((DWORD64)this + 0x40) = game_tick;
 	}
 	void Reset()
 	{
-		*(bool*)((uintptr_t)this + 0x14) = 0x0;
+		*(bool*)((uintptr_t)this + 0x24) = 0x0;
 	}
 };
 
 class Controls
 {
 private:
-	char pad[0x18];
+	char pad[0x30];
 public:
 	Input* up;
 	Input* down;
@@ -50,7 +50,7 @@ public:
 class PlayerSettings
 {
 private:
-	char pad[0x8];
+	char pad[0x10];
 public:
 	Controls* controls;
 };
