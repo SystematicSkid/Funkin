@@ -45,6 +45,11 @@ public:
 	Input* left_press;
 	Input* right_press;
 	Input* down_press;
+	Input* up_release;
+	Input* left_release;
+	Input* right_release;
+	Input* down_release;
+
 };
 
 class PlayerSettings

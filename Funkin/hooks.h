@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include "MinHook.h"
 
 namespace hooks
@@ -8,12 +9,14 @@ namespace hooks
 	Note* last_note;
 	
 	static bool can_input = false;
+	const int release_ticks = 10;
+	int tick = 0;
+
+	std::map<Input*, int> simulate_ticks;
 	
 	PVOID original_playstate = nullptr;
 	void __fastcall hook_playstate(PlayState* play_state)
 	{
-		g_PlayState = play_state;
-		can_input = true;
 		if (!g_Settings)
 			g_Settings = *reinterpret_cast<PlayerSettings**>((DWORD)GetModuleHandleA(0) + 0x00CC6FE8);
 		if(play_state->active_notes)
@@ -27,30 +30,51 @@ namespace hooks
 					{
 					case 0:
 						if (note->can_be_hit && note->must_press && !note->IsTooLate())
-							g_Settings->controls->left_press->Simulate();
-						else
-							g_Settings->controls->left_press->Reset();
-						break;
-					case 1:
-						if (note->can_be_hit && note->must_press && !note->IsTooLate() && (note != last_note && !note->is_sustained_note))
 						{
-							g_Settings->controls->down_press->Simulate();
-							last_note = note;
+							g_Settings->controls->left_press->Simulate();
+							simulate_ticks[g_Settings->controls->left_release] = tick;
 						}
 						else
+						{
+							g_Settings->controls->left_press->Reset();
+						}
+						break;
+					case 1:
+						if (note->can_be_hit && note->must_press && !note->IsTooLate())
+						{
+							g_Settings->controls->down_release->Reset();
+							g_Settings->controls->down_press->Simulate();
+							simulate_ticks[g_Settings->controls->down_release] = tick;
+						}
+						else
+						{
 							g_Settings->controls->down_press->Reset();
+						}
 						break;
 					case 2:
 						if (note->can_be_hit && note->must_press && !note->IsTooLate())
+						{
+							g_Settings->controls->up_release->Reset();
 							g_Settings->controls->up_press->Simulate();
+							simulate_ticks[g_Settings->controls->up_release] = tick;
+						}
 						else
+						{
 							g_Settings->controls->up_press->Reset();
+						}
 						break;
 					case 3:
 						if (note->can_be_hit && note->must_press && !note->IsTooLate())
+						{
+							g_Settings->controls->right_release->Reset();
 							g_Settings->controls->right_press->Simulate();
+							simulate_ticks[g_Settings->controls->right_release] = tick;
+
+						}
 						else
+						{
 							g_Settings->controls->right_press->Reset();
+						}
 						break;
 					default:
 						break;
@@ -58,8 +82,17 @@ namespace hooks
 				}
 			}
 		}
+
+		for (auto& [key, value] : simulate_ticks) 
+		{
+			if (tick - value > release_ticks)
+			{
+				key->Simulate();
+			}
+		}
+
+		tick++;
 		static_cast<void(__thiscall*)(PlayState*)>(original_playstate)(play_state);
-		can_input = false;
 		return;
 	}
 
