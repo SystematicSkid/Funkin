@@ -19,7 +19,7 @@ namespace hooks
 	{
 		if (!g_Settings)
 			g_Settings = *reinterpret_cast<PlayerSettings**>((DWORD)GetModuleHandleA(0) + 0x00CC6FE8);
-		if(play_state->active_notes)
+		if(play_state->active_notes && !play_state->InCutscene())
 		{
 			auto notes = play_state->active_notes->GetObjects();
 			for(auto* note : notes)

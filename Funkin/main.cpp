@@ -19,14 +19,14 @@ void init()
 
 	/* Initialize our output console */
 	/* TODO: Move this into a debug macro */
-	AllocConsole();
-	/* Assign `stdin`, `stout`, `stderr`  */
-	::freopen_s(&pNewStdin, "CONIN$", "r", stdin);
-	::freopen_s(&pNewStdout, "CONOUT$", "w", stdout);
-	::freopen_s(&pNewStderr, "CONOUT$", "w", stderr);
+	//AllocConsole();
+	///* Assign `stdin`, `stout`, `stderr`  */
+	//::freopen_s(&pNewStdin, "CONIN$", "r", stdin);
+	//::freopen_s(&pNewStdout, "CONOUT$", "w", stdout);
+	//::freopen_s(&pNewStderr, "CONOUT$", "w", stderr);
 
 
-	printf("Hooking!\n");
+	//printf("Hooking!\n");
 
 	hooks::init();
 }

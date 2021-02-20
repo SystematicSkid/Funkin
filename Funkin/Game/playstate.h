@@ -53,4 +53,9 @@ private:
 	char pad[0x128];
 public:
 	ObjectGroup<Note*>* active_notes;
+public:
+	bool InCutscene()
+	{
+		return *(bool*)((uintptr_t)this + 0x250);
+	}
 };
