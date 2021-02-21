@@ -9,4 +9,5 @@ This bot will automatically play any note in the active game.
 
 ## Showcase
 https://www.youtube.com/watch?v=TrNXCgCOvrM&feature=youtu.be
+
 https://www.youtube.com/watch?v=mGp5uFN31bA&feature=youtu.be
