@@ -2,6 +2,9 @@
 #include <iostream>
 #include <vector>
 
+// memory
+#include "./memory.h"
+
 // sdk
 #include "./Game/game.h"
 #include "./Game/note.h"

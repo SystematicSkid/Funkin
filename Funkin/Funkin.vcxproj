@@ -157,6 +157,7 @@
     <ClInclude Include="Game\playersettings.h" />
     <ClInclude Include="Game\playstate.h" />
     <ClInclude Include="hooks.h" />
+    <ClInclude Include="memory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
