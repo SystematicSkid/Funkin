@@ -56,7 +56,7 @@ public:
 public:
 	bool InCutscene()
 	{
-		auto offset = *(DWORD*)(Memory::SigScan("80 BE ? ? ? ? ? 4C 8B A4 24") + 0x2);
+		static auto offset = *(DWORD*)(Memory::SigScan("80 BE ? ? ? ? ? 4C 8B A4 24") + 0x2);
 		return *(bool*)((uintptr_t)this + offset);
 	}
 
@@ -64,7 +64,16 @@ public:
 
 	ObjectGroup<Note*>* GetActiveNotes()
 	{
-		auto offset = *(DWORD*)(Memory::SigScan("48 8B 8E ? ? ? ? 48 8D 55 8F") + 0x3);
+		static auto offset = *(DWORD*)(Memory::SigScan("48 8B 8E ? ? ? ? 48 8D 55 8F") + 0x3);
 		return *(ObjectGroup<Note*>**)((uintptr_t)this + offset);
+	}
+
+	void SetHoldTimer(double val)
+	{
+		static auto offset = *(DWORD*)(Memory::SigScan("48 8B 8E ? ? ? ? 48 8D 55 8F") + 0x3) - 0x8;
+		uintptr_t bf = *(uintptr_t*)((uintptr_t)this + offset);
+		if (!bf)
+			return;
+		*(double*)(bf + 0x218) = val;
 	}
 };

@@ -8,10 +8,10 @@ namespace hooks
 	PlayState* g_PlayState;
 	Note* last_note;
 	ptr g_CurrentSongPos = 0;
+	int last_note_tick = 0;
 	
 	static bool can_input = false;
-	const int release_ticks = 10;
-	int tick = 0;
+	const int release_ticks = 125;
 
 	std::map<Input*, int> simulate_ticks;
 	
@@ -19,9 +19,10 @@ namespace hooks
 	void __fastcall hook_playstate(PlayState* play_state)
 	{
 		//printf("Playstate: 0x%p\n", play_state);
-		//printf("Settings: 0x%p\n", g_Settings);
+		////printf("Settings: 0x%p\n", g_Settings);
 		if (!g_Settings)
 			g_Settings = *reinterpret_cast<PlayerSettings**>(Memory::GetInstanceAddress("48 8B 0D ? ? ? ? 88 45 8E"));
+		int tick = FlxGame::Instance->tick;
 		if(play_state->active_notes && !play_state->InCutscene())
 		{
 			auto notes = play_state->GetActiveNotes()->GetObjects();
@@ -36,6 +37,7 @@ namespace hooks
 						{
 							g_Settings->controls->left_press->Simulate();
 							simulate_ticks[g_Settings->controls->left_release] = tick;
+							last_note_tick = tick;
 						}
 						else
 						{
@@ -48,6 +50,8 @@ namespace hooks
 							g_Settings->controls->down_release->Reset();
 							g_Settings->controls->down_press->Simulate();
 							simulate_ticks[g_Settings->controls->down_release] = tick;
+							last_note_tick = tick;
+
 						}
 						else
 						{
@@ -60,6 +64,8 @@ namespace hooks
 							g_Settings->controls->up_release->Reset();
 							g_Settings->controls->up_press->Simulate();
 							simulate_ticks[g_Settings->controls->up_release] = tick;
+							last_note_tick = tick;
+
 						}
 						else
 						{
@@ -72,6 +78,8 @@ namespace hooks
 							g_Settings->controls->right_release->Reset();
 							g_Settings->controls->right_press->Simulate();
 							simulate_ticks[g_Settings->controls->right_release] = tick;
+							last_note_tick = tick;
+
 
 						}
 						else
@@ -86,7 +94,7 @@ namespace hooks
 			}
 		}
 
-		for (auto& [key, value] : simulate_ticks) 
+		for (auto& [key, value] : simulate_ticks)
 		{
 			if (tick - value > release_ticks)
 			{
@@ -95,9 +103,14 @@ namespace hooks
 			}
 		}
 
-		tick++;
-		static_cast<void(__thiscall*)(PlayState*)>(original_playstate)(play_state);
-		return;
+		if (tick - last_note_tick > 500)
+		{
+			play_state->SetHoldTimer(1.0);
+		}
+
+		return static_cast<void(__thiscall*)(PlayState*)>(original_playstate)(play_state);
+
+		
 	}
 
 	PVOID original_popupscore = nullptr;
